@@ -28,8 +28,8 @@ final class SearchUtility {
         var score: Float = 0
 
         // Otherwise, tokenize the target by words and check each word's distance to the query
-        let queryWords = query.split(separator: " ").filter { $0.count < 32 }.prefix(3)
-        let targetWords = target.split(separator: " ").filter { $0.count < 32 }.prefix(3)
+        let queryWords = query.prefix(32).split(separator: " ").prefix(4)
+        let targetWords = target.prefix(32).split(separator: " ").prefix(4)
 
         for queryWord in queryWords {
             for targetWord in targetWords {
@@ -48,7 +48,7 @@ final class SearchUtility {
         let index = collection.map { item in
             (key: item, value: SearchUtility.searchScore(query: query, target: item.searchIndex))
         }
-        return index.filter { $0.value > 0 }.sorted(by: { $0.value > $1.value }).map(\.key)
+        return index.filter { $0.value >= 0.1 }.sorted(by: { $0.value > $1.value }).map(\.key)
     }
 }
 

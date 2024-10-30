@@ -38,12 +38,13 @@ public struct SymbolsPicker<Content: View>: View {
                         GridItem(),
                         GridItem(),
                         GridItem()
-                    ], spacing: 20
+                    ], spacing: 48
                 ) {
                     ForEach(vm.symbols, id: \.systemIconName) { symbol in
                         SymbolIcon(
                             symbolName: symbol.systemIconName
                         )
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             withAnimation {
                                 self.selection = symbol.systemIconName
@@ -51,6 +52,8 @@ public struct SymbolsPicker<Content: View>: View {
                         }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 44)
             }
             .navigationTitle(vm.title)
 #if os(iOS)
@@ -65,11 +68,12 @@ public struct SymbolsPicker<Content: View>: View {
                     }
                 }
             }
-            .padding(5)
+            .padding(.top, 5)
+            .ignoresSafeArea(edges: .bottom)
             .searchable(text: $vm.searchText, prompt: vm.searchbarLabel)
         }
         .onChange(of: selection) { newValue in
-            if(vm.autoDismiss) {
+            if vm.autoDismiss {
                 presentationMode.wrappedValue.dismiss()
             }
         }

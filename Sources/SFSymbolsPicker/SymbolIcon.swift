@@ -13,7 +13,6 @@ struct SymbolIcon: View {
     var body: some View {
         Image(systemName: symbolName)
             .imageScale(.large)
-            .contentShape(Rectangle())
     }
     
 }

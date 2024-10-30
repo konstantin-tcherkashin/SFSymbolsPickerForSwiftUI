@@ -12,14 +12,14 @@ public class SymbolLoader {
 
     private let symbolsPerPage = 100
     private var currentPage = 0
-    private final var allSymbols: [String] = []
-    
+    private final var allSymbols: [Symbol] = []
+
     public init() {
         self.allSymbols = getAllSymbols()
     }
 
     // Retrieves symbols for the current page
-    public func getSymbols() -> [String] {
+    public func getSymbols() -> [Symbol] {
         currentPage += 1
 
         // Calculate start and end index for the requested page
@@ -29,37 +29,37 @@ public class SymbolLoader {
         // Extract symbols for the page
         return Array(allSymbols[startIndex..<endIndex])
     }
-    
+
     // Retrieves symbols that start with the specified name
-    public func getSymbols(named name: String) -> [String] {
-        return allSymbols.filter({$0.lowercased().starts(with: name.lowercased())})
+    public func getSymbols(named name: String) -> [Symbol] {
+        SearchUtility.search(query: name, in: allSymbols)
     }
-    
+
     // Checks if there are more symbols available
     public func hasMoreSymbols() -> Bool {
         return currentPage * symbolsPerPage < allSymbols.count
     }
-    
+
     // Resets the pagination to the initial state
     public func resetPagination() {
         currentPage = 0
     }
-    
+
     // Loads all symbols from the plist file
-    private func getAllSymbols() -> [String] {
-        var allSymbols = [String]()
+    private func getAllSymbols() -> [Symbol] {
         if let bundle = Bundle(identifier: "com.apple.CoreGlyphs"),
-            let resourcePath = bundle.path(forResource: "name_availability", ofType: "plist"),
-            let plist = NSDictionary(contentsOfFile: resourcePath),
-            let plistSymbols = plist["symbols"] as? [String: String]
+           let resourcePath = bundle.path(forResource: "name_availability", ofType: "plist"),
+           let plist = NSDictionary(contentsOfFile: resourcePath),
+           let plistSymbols = plist["symbols"] as? [String: String],
+           let searchIndexPlistPath = bundle.path(forResource: "symbol_search", ofType: "plist"),
+           let parsedSearchIndex = NSDictionary(contentsOfFile: searchIndexPlistPath) as? [String: [String]]
         {
-            // Get all symbol names
-            allSymbols = Array(plistSymbols.keys)
+            return Array(plistSymbols.keys).sorted(by: {
+                $1 > $0
+            }).map {
+                Symbol(systemIconName: $0, aliases: parsedSearchIndex[$0] ?? [])
+            }
         }
-        return allSymbols.sorted(by: {
-            $1 > $0
-        })
+        return []
     }
-
 }
-

@@ -34,16 +34,23 @@ public struct SymbolsPicker<Content: View>: View {
         NavigationView {
             VStack {
                 ScrollView(.vertical) {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 70))], spacing: 20) {
-                        ForEach(vm.symbols, id: \.hash) { icon in
+                    LazyVGrid(
+                        columns: [
+                            GridItem(),
+                            GridItem(),
+                            GridItem(),
+                            GridItem()
+                        ], spacing: 20
+                    ) {
+                        ForEach(vm.symbols, id: \.systemIconName) { symbol in
                             Button {
                                 withAnimation {
-                                    self.selection = icon
+                                    self.selection = symbol.systemIconName
                                 }
                             } label: {
-                                SymbolIcon(symbolName: icon, selection: $selection)
+                                SymbolIcon(symbolName: symbol.systemIconName, selection: $selection)
                             }
-
+                            
                         }.padding(.top, 5)
                     }
                     
@@ -56,9 +63,9 @@ public struct SymbolsPicker<Content: View>: View {
                     }
                 }
                 .navigationTitle(vm.title)
-                #if os(iOS)
+#if os(iOS)
                 .navigationBarTitleDisplayMode(.inline)
-                #endif
+#endif
                 .toolbar {
                     ToolbarItem(placement: .confirmationAction) {
                         Button {
@@ -88,7 +95,7 @@ public struct SymbolsPicker<Content: View>: View {
             }
         }
     }
-
+    
 }
 
 #Preview {

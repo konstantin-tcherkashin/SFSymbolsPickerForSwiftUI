@@ -15,8 +15,8 @@ public class SymbolsPickerViewModel: ObservableObject {
     let autoDismiss: Bool
     private let symbolLoader: SymbolLoader = SymbolLoader()
     
-    @Published var symbols: [String] = []
-    
+    @Published var symbols: [Symbol] = []
+
     init(title: String, searchbarLabel: String, autoDismiss: Bool) {
         self.title = title
         self.searchbarLabel = searchbarLabel

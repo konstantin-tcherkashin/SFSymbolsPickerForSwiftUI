@@ -20,7 +20,7 @@ final class SearchUtility {
         }
         // If the target contains the query as a substring, return true
         if target.lowercased().contains(query.lowercased()) {
-            return 1
+            return 100
         }
 
         guard query.count >= 3 else { return 0 }

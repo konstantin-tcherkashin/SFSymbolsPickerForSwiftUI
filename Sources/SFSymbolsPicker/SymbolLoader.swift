@@ -9,9 +9,6 @@ import Foundation
 
 // This class is responsible for loading symbols from system
 public class SymbolLoader {
-
-    private let symbolsPerPage = 100
-    private var currentPage = 0
     private final var allSymbols: [Symbol] = []
 
     public init() {
@@ -20,29 +17,12 @@ public class SymbolLoader {
 
     // Retrieves symbols for the current page
     public func getSymbols() -> [Symbol] {
-        currentPage += 1
-
-        // Calculate start and end index for the requested page
-        let startIndex = (currentPage - 1) * symbolsPerPage
-        let endIndex = min(startIndex + symbolsPerPage, allSymbols.count)
-
-        // Extract symbols for the page
-        return Array(allSymbols[startIndex..<endIndex])
+        return allSymbols
     }
 
     // Retrieves symbols that start with the specified name
     public func getSymbols(named name: String) -> [Symbol] {
         SearchUtility.search(query: name, in: allSymbols)
-    }
-
-    // Checks if there are more symbols available
-    public func hasMoreSymbols() -> Bool {
-        return currentPage * symbolsPerPage < allSymbols.count
-    }
-
-    // Resets the pagination to the initial state
-    public func resetPagination() {
-        currentPage = 0
     }
 
     // Loads all symbols from the plist file

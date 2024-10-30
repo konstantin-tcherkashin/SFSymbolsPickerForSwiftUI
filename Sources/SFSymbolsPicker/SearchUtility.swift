@@ -44,6 +44,7 @@ final class SearchUtility {
     }
 
     static func search<T: SearchableElement>(query: String, in collection: [T]) -> [T] {
+        guard query.trimmingCharacters(in: .whitespacesAndNewlines).count > 1 else { return collection }
         let index = collection.map { item in
             (key: item, value: SearchUtility.searchScore(query: query, target: item.searchIndex))
         }

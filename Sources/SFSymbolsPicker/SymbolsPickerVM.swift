@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 public class SymbolsPickerViewModel: ObservableObject {
     
@@ -14,40 +15,33 @@ public class SymbolsPickerViewModel: ObservableObject {
     let searchbarLabel: String
     let autoDismiss: Bool
     private let symbolLoader: SymbolLoader = SymbolLoader()
-    
-    @Published var symbols: [Symbol] = []
+    private var bag = Set<AnyCancellable>()
 
-    init(title: String, searchbarLabel: String, autoDismiss: Bool) {
+    @Published var symbols: [Symbol] = []
+    @Published var searchText: String = ""
+
+    init(
+        title: String,
+        searchbarLabel: String,
+        autoDismiss: Bool
+    ) {
         self.title = title
         self.searchbarLabel = searchbarLabel
         self.autoDismiss = autoDismiss
-        self.symbols = []
-        self.loadSymbols()
+        self.symbols = symbolLoader.getSymbols()
+
+        $searchText
+            .removeDuplicates()
+            .throttle(for: 1.0, scheduler: RunLoop.main, latest: true)
+            .sink { [weak self] query in
+                self?.searchSymbols(with: query)
+            }.store(in: &bag)
+
     }
     
-    public var hasMoreSymbols: Bool {
-        return symbolLoader.hasMoreSymbols()
-    }
-    
-    public func loadSymbols() {
-        if(symbolLoader.hasMoreSymbols()) {
-            withAnimation {
-                symbols = symbols + symbolLoader.getSymbols()
-            }
-        }
-    }
-    
-    public func searchSymbols(with name: String) {
+    private func searchSymbols(with name: String) {
         withAnimation {
             symbols = symbolLoader.getSymbols(named: name)
         }
     }
-    
-    public func reset() {
-        symbolLoader.resetPagination()
-        symbols.removeAll()
-        loadSymbols()
-    }
-    
-
 }

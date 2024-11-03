@@ -18,14 +18,15 @@ final class SearchUtility {
         guard !query.isEmpty else {
             return 1
         }
-        // If the target contains the query as a substring, return true
-        if target.lowercased().contains(query.lowercased()) {
-            return 100
-        }
 
         guard query.count >= 3 else { return 0 }
 
         var score: Float = 0
+
+        // If the target contains the query as a substring, add points
+        if target.lowercased().contains(query.lowercased()) {
+            score += 1
+        }
 
         // Otherwise, tokenize the target by words and check each word's distance to the query
         let queryWords = query.prefix(32).split(separator: " ").prefix(4)

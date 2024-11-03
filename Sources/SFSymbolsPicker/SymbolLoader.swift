@@ -21,8 +21,11 @@ public class SymbolLoader {
     }
 
     // Retrieves symbols that start with the specified name
-    public func getSymbols(named name: String) -> [Symbol] {
-        SearchUtility.search(query: name, in: allSymbols)
+    public func getSymbols(named name: String) async -> [Symbol] {
+        let task = Task(priority: .utility) { () -> [Symbol] in
+            return SearchUtility.search(query: name, in: allSymbols)
+        }
+        return await task.result.get()
     }
 
     // Loads all symbols from the plist file

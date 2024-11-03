@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct Symbol {
+public struct Symbol: Sendable {
     public let systemIconName: String
     public let aliases: [String]
 }

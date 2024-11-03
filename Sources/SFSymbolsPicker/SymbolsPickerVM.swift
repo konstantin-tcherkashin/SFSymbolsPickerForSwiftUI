@@ -10,7 +10,6 @@ import SwiftUI
 import Combine
 
 public class SymbolsPickerViewModel: ObservableObject {
-
     let title: String
     let searchbarLabel: String
     let autoDismiss: Bool
@@ -35,7 +34,7 @@ public class SymbolsPickerViewModel: ObservableObject {
 
         $searchText
             .removeDuplicates()
-            .throttle(for: 0.3, scheduler: RunLoop.main, latest: true)
+            .throttle(for: 0.4, scheduler: RunLoop.main, latest: true)
             .sink { [weak self] query in
                 self?.searchSymbols(with: query)
             }.store(in: &bag)
@@ -43,13 +42,19 @@ public class SymbolsPickerViewModel: ObservableObject {
     }
 
     private func searchSymbols(with name: String) {
-        withAnimation {
-            guard name.trimmingCharacters(in: .whitespacesAndNewlines).count > 1 else {
+        guard name.trimmingCharacters(in: .whitespacesAndNewlines).count > 1 else {
+            withAnimation {
                 symbols = symbolLoader.getSymbols()
-                return
             }
-
-            symbols = Array(symbolLoader.getSymbols(named: name).prefix(64))
+            return
+        }
+        Task(priority: .utility) {
+            let results = Array(await symbolLoader.getSymbols(named: name).prefix(64))
+            await MainActor.run {
+                withAnimation {
+                    symbols = results
+                }
+            }
         }
     }
 }

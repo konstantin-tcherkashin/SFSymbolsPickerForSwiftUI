@@ -11,22 +11,26 @@ protocol SearchableElement {
     var searchIndex: String { get }
 }
 
+import Foundation
+
 final class SearchUtility {
     static let maxDistance: Float = 2.0
 
     static func searchScore(query: String, target: String) -> Float {
-        guard !query.isEmpty else { return 1.0 }
-        guard query.count >= 3 else { return 0.0 }
+        guard query.count >= 3 else { return 1.0 }
 
         var score: Float = 0.0
-        let queryWords = query.split(separator: " ")
-        let targetWords = target.split(separator: " ")
+        let queryWords = query.lowercased().replacingOccurrences(of: ".", with: " ").split(separator: " ")
+        let targetWords = target.lowercased().replacingOccurrences(of: ".", with: " ").split(separator: " ")
 
         for queryWord in queryWords {
-            for targetWord in targetWords {
+            for (targetWordIndex, targetWord) in targetWords.enumerated() {
+                if queryWord == targetWord {
+                    score += 1
+                }
                 let distance = Float(String(targetWord).levenshteinDistance(to: String(queryWord)))
                 if distance <= maxDistance {
-                    score += max(0.1, 1 / (distance + 1))
+                    score += 1 / (distance + 1 + Float(targetWordIndex))
                 }
             }
         }
@@ -34,8 +38,8 @@ final class SearchUtility {
         // Boost score based on exact substring match, scaled by match length
         if let range = target.lowercased().range(of: query.lowercased()) {
             let matchedSubstring = target[range]
-            let matchLengthBoost = Float(matchedSubstring.count) / Float(target.count)
-            score += matchLengthBoost * 0.5
+            let matchLengthBoost = Float(matchedSubstring.count) / Float(query.count + target.count)
+            score += matchLengthBoost
         }
 
         return score
@@ -46,7 +50,7 @@ final class SearchUtility {
         let indexedCollection = collection.map { item in
             (key: item, value: searchScore(query: query, target: item.searchIndex))
         }
-        return indexedCollection.filter { $0.value >= 0.1 }.sorted(by: { $0.value > $1.value }).map(\.key)
+        return indexedCollection.filter { $0.value >= 0.5 }.sorted(by: { $0.value > $1.value }).map(\.key)
     }
 }
 

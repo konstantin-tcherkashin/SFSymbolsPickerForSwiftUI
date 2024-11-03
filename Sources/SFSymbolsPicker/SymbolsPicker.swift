@@ -50,7 +50,7 @@ public struct SymbolsPicker<Content: View>: View {
                         GridItem(),
                         GridItem(),
                         GridItem()
-                    ], spacing: 48
+                    ], spacing: 49
                 ) {
                     ForEach(vm.symbols, id: \.systemIconName) { symbol in
                         SymbolIcon(

@@ -14,7 +14,7 @@ public class SymbolsPickerViewModel: ObservableObject {
     let title: String
     let searchbarLabel: String
     let autoDismiss: Bool
-    private let symbolLoader: SymbolLoader = SymbolLoader()
+    private let symbolLoader: SymbolLoader
     private var bag = Set<AnyCancellable>()
 
     @Published var symbols: [Symbol] = []
@@ -23,11 +23,14 @@ public class SymbolsPickerViewModel: ObservableObject {
     init(
         title: String,
         searchbarLabel: String,
-        autoDismiss: Bool
+        autoDismiss: Bool,
+        symbolLoader: SymbolLoader
     ) {
         self.title = title
         self.searchbarLabel = searchbarLabel
         self.autoDismiss = autoDismiss
+        self.symbolLoader = symbolLoader
+
         self.symbols = symbolLoader.getSymbols()
 
         $searchText

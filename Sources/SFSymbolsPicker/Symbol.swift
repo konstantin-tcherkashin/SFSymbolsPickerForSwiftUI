@@ -8,8 +8,8 @@
 import Foundation
 
 public struct Symbol {
-    let systemIconName: String
-    let aliases: [String]
+    public let systemIconName: String
+    public let aliases: [String]
 }
 
 extension Symbol: SearchableElement {
